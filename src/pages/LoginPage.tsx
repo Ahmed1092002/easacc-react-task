@@ -36,11 +36,6 @@ export default function LoginPage() {
         </div>
 
         <AuthModeBadge authMode={authMode} />
-        {authMode === 'full' ? (
-          <p className="config-note">
-            OAuth redirect URI: <code>{getOAuthRedirectUri()}</code>
-          </p>
-        ) : null}
 
         <div className="button-stack">
           <button type="button" className="provider-button google" onClick={() => void handleLogin('google')}>
