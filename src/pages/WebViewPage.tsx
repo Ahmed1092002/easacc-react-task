@@ -101,17 +101,27 @@ export default function WebViewPage() {
           <p className="muted">Connect to WiFi or cellular data to load this website.</p>
         </section>
       ) : (
-        <section className="webview-frame">
-          <iframe key={frameKey} title="Configured website" src={normalizedUrl} sandbox="allow-forms allow-scripts allow-same-origin allow-popups" />
-        </section>
+        <>
+          <p className="embed-note">
+            Some websites block embedded previews for security. If the frame refuses to connect, open it in a new tab.
+          </p>
+          <section className="webview-frame">
+            <iframe
+              key={frameKey}
+              title="Configured website"
+              src={normalizedUrl}
+              sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
+            />
+          </section>
+        </>
       )}
 
       <div className="webview-actions">
         <button type="button" onClick={() => void handleOpenInApp()}>
-          Open in app browser
+          Open in new tab
         </button>
         <button type="button" className="secondary-button" onClick={() => void handleOpenSystemBrowser()}>
-          Open system browser
+          Open browser tab
         </button>
       </div>
 
