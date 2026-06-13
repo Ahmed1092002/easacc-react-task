@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import EmptyState from '../components/EmptyState';
+import PageHeader from '../components/PageHeader';
+import StatusMessage from '../components/StatusMessage';
 import { openUrlInApp, openUrlInSystemBrowser } from '../services/inAppBrowser';
 import { isOnline } from '../services/network';
 import { normalizeUrl } from '../services/url';
@@ -57,13 +60,16 @@ export default function WebViewPage() {
   if (!webUrl) {
     return (
       <main className="screen center-screen with-nav">
-        <section className="empty-state">
-          <h1>No URL saved</h1>
-          <p className="muted">Add a website URL in settings first.</p>
-          <button type="button" onClick={() => navigate('/settings')}>
-            Go to Settings
-          </button>
-        </section>
+        <EmptyState
+          title="No URL saved"
+          action={
+            <button type="button" onClick={() => navigate('/settings')}>
+              Go to Settings
+            </button>
+          }
+        >
+          Add a website URL in settings first.
+        </EmptyState>
       </main>
     );
   }
@@ -71,35 +77,36 @@ export default function WebViewPage() {
   if (!normalizedUrl) {
     return (
       <main className="screen center-screen with-nav">
-        <section className="empty-state">
-          <h1>Invalid URL</h1>
-          <p className="muted">The saved URL cannot be opened.</p>
-          <button type="button" onClick={() => navigate('/settings')}>
-            Edit URL
-          </button>
-        </section>
+        <EmptyState
+          title="Invalid URL"
+          action={
+            <button type="button" onClick={() => navigate('/settings')}>
+              Edit URL
+            </button>
+          }
+        >
+          The saved URL cannot be opened.
+        </EmptyState>
       </main>
     );
   }
 
   return (
     <main className="screen webview-screen with-nav">
-      <header className="page-header compact">
-        <div>
-          <p className="eyebrow">Web View</p>
-          <h1>{new URL(normalizedUrl).hostname}</h1>
-          {selectedDevice ? <p className="muted">Device: {selectedDevice.name}</p> : null}
-        </div>
-        <button type="button" className="secondary-button" onClick={() => setFrameKey((current) => current + 1)}>
-          Refresh
-        </button>
-      </header>
+      <PageHeader
+        compact
+        eyebrow="Web View"
+        title={new URL(normalizedUrl).hostname}
+        subtitle={selectedDevice ? <p className="muted">Device: {selectedDevice.name}</p> : null}
+        action={
+          <button type="button" className="secondary-button" onClick={() => setFrameKey((current) => current + 1)}>
+            Refresh
+          </button>
+        }
+      />
 
       {online === false ? (
-        <section className="empty-state">
-          <h2>You are offline</h2>
-          <p className="muted">Connect to WiFi or cellular data to load this website.</p>
-        </section>
+        <EmptyState title="You are offline">Connect to WiFi or cellular data to load this website.</EmptyState>
       ) : (
         <>
           <p className="embed-note">
@@ -125,7 +132,7 @@ export default function WebViewPage() {
         </button>
       </div>
 
-      {browserError ? <p className="status error">{browserError}</p> : null}
+      <StatusMessage tone="error">{browserError}</StatusMessage>
     </main>
   );
 }

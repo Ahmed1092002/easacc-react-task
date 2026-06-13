@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthModeBadge from '../components/AuthModeBadge';
+import PageHeader from '../components/PageHeader';
+import SectionCard from '../components/SectionCard';
+import StatusMessage from '../components/StatusMessage';
 import { scanForBluetoothDevices } from '../services/bluetooth';
 import { normalizeUrl } from '../services/url';
 import { useApp } from '../state/AppContext';
@@ -57,21 +61,17 @@ export default function SettingsPage() {
 
   return (
     <main className="screen with-nav">
-      <header className="page-header">
-        <div>
-          <p className="eyebrow">Settings</p>
-          <h1>App Configuration</h1>
-        </div>
-        <button type="button" className="text-button" onClick={() => void signOut()}>
-          Sign out
-        </button>
-      </header>
+      <PageHeader
+        eyebrow="Settings"
+        title="App Configuration"
+        action={
+          <button type="button" className="text-button" onClick={() => void signOut()}>
+            Sign out
+          </button>
+        }
+      />
 
-      <section className="section-card">
-        <div className="section-title">
-          <h2>Website URL</h2>
-          <p className="muted">This URL will open on the Web View page.</p>
-        </div>
+      <SectionCard title="Website URL" description="This URL will open on the Web View page.">
         <label className="field-label" htmlFor="webUrl">
           Web URL
         </label>
@@ -90,25 +90,17 @@ export default function SettingsPage() {
             Open Web View
           </button>
         </div>
-        {urlError ? <p className="status error">{urlError}</p> : null}
-        {savedMessage ? <p className="status success">{savedMessage}</p> : null}
+        <StatusMessage tone="error">{urlError}</StatusMessage>
+        <StatusMessage tone="success">{savedMessage}</StatusMessage>
         {webUrl ? <p className="saved-url">Saved: {webUrl}</p> : null}
-      </section>
+      </SectionCard>
 
-      <section className="section-card">
-        <div className="section-title">
-          <h2>Authentication</h2>
-          <p className="muted">Demo mode works without external provider credentials.</p>
-        </div>
-        <p className="mode-pill">Current mode: {authMode === 'full' ? 'Full OAuth' : 'Demo mock'}</p>
+      <SectionCard title="Authentication" description="Demo mode works without external provider credentials.">
+        <AuthModeBadge authMode={authMode} label="Current mode" />
         {currentUser ? <p className="saved-url">Signed in as {currentUser.email}</p> : null}
-      </section>
+      </SectionCard>
 
-      <section className="section-card">
-        <div className="section-title">
-          <h2>Bluetooth Device</h2>
-          <p className="muted">Scan nearby Bluetooth LE devices and choose one from the dropdown.</p>
-        </div>
+      <SectionCard title="Bluetooth Device" description="Scan nearby Bluetooth LE devices and choose one from the dropdown.">
         <button type="button" className="secondary-button" onClick={() => void handleScan()} disabled={isScanning}>
           {isScanning ? 'Scanning...' : 'Scan devices'}
         </button>
@@ -127,9 +119,9 @@ export default function SettingsPage() {
             </option>
           ))}
         </select>
-        {deviceError ? <p className="status error">{deviceError}</p> : null}
+        <StatusMessage tone="error">{deviceError}</StatusMessage>
         {selectedDevice ? <p className="saved-url">Selected: {selectedDevice.name}</p> : null}
-      </section>
+      </SectionCard>
     </main>
   );
 }

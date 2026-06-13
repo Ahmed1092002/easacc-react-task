@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthModeBadge from '../components/AuthModeBadge';
+import StatusMessage from '../components/StatusMessage';
 import { useApp } from '../state/AppContext';
 import type { LoginProvider } from '../types';
 
@@ -32,7 +34,7 @@ export default function LoginPage() {
           <p className="muted">Sign in, choose the website URL, select a nearby device, and open the site in the app.</p>
         </div>
 
-        <p className="mode-pill">Auth mode: {authMode === 'full' ? 'Full OAuth' : 'Demo mock'}</p>
+        <AuthModeBadge authMode={authMode} />
 
         <div className="button-stack">
           <button type="button" className="provider-button google" onClick={() => void handleLogin('google')}>
@@ -43,7 +45,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {error ? <p className="status error">{error}</p> : null}
+        <StatusMessage tone="error">{error}</StatusMessage>
 
         {currentUser ? (
           <div className="signed-in-summary">
