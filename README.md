@@ -58,7 +58,9 @@ iOS requires macOS and Xcode.
 
 ## Environment Variables
 
-Create `.env` from `.env.example`.
+Create a real `.env` file from `.env.example`.
+
+Important: Vite reads `.env`, not `.env.example`. `.env.example` is only a sample file.
 
 ```env
 VITE_USE_FULL_AUTH=false
@@ -80,6 +82,63 @@ Starts the Google/Facebook OAuth flow and requires:
 - `VITE_FACEBOOK_APP_ID`
 
 The project opens provider authorization URLs, but production token callback handling still needs real provider configuration.
+
+After changing `.env`, restart the dev server:
+
+```bash
+npm run dev
+```
+
+## OAuth Setup
+
+### Google Client ID
+
+1. Open Google Cloud Console credentials:
+   https://console.cloud.google.com/apis/credentials
+2. Create or select a project.
+3. Create an OAuth Client ID.
+4. Choose `Web application`.
+5. Add Authorized JavaScript origins:
+
+```text
+http://localhost:5173
+http://127.0.0.1:5173
+```
+
+6. Add Authorized redirect URIs:
+
+```text
+http://localhost:5173/login
+http://127.0.0.1:5173/login
+```
+
+7. Copy the generated Client ID into `.env`:
+
+```env
+VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+```
+
+The login page shows the exact redirect URI used by the app. If Google shows `redirect_uri_mismatch`, add that exact URI to the OAuth Client ID settings.
+
+### Facebook App ID
+
+1. Open Meta for Developers:
+   https://developers.facebook.com/apps/
+2. Create an app.
+3. Go to `App settings` -> `Basic`.
+4. Copy `App ID`.
+5. Add Facebook Login if needed.
+6. Add the valid OAuth redirect URI:
+
+```text
+http://localhost:5173/login
+```
+
+7. Add it to `.env`:
+
+```env
+VITE_FACEBOOK_APP_ID=your-facebook-app-id
+```
 
 ## Main Features
 
