@@ -9,8 +9,12 @@ export function getConfiguredAuthMode(): AuthMode {
   return import.meta.env.VITE_USE_FULL_AUTH === 'true' ? 'full' : 'demo';
 }
 
+export function getOAuthRedirectUri(): string {
+  return `${window.location.origin}/login`;
+}
+
 function openOAuthWindow(provider: LoginProvider) {
-  const redirectUri = `${window.location.origin}/login`;
+  const redirectUri = getOAuthRedirectUri();
   const authUrl =
     provider === 'google'
       ? new URL('https://accounts.google.com/o/oauth2/v2/auth')

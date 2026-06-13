@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthModeBadge from '../components/AuthModeBadge';
 import StatusMessage from '../components/StatusMessage';
+import { getOAuthRedirectUri } from '../services/auth';
 import { useApp } from '../state/AppContext';
 import type { LoginProvider } from '../types';
 
@@ -35,6 +36,11 @@ export default function LoginPage() {
         </div>
 
         <AuthModeBadge authMode={authMode} />
+        {authMode === 'full' ? (
+          <p className="config-note">
+            OAuth redirect URI: <code>{getOAuthRedirectUri()}</code>
+          </p>
+        ) : null}
 
         <div className="button-stack">
           <button type="button" className="provider-button google" onClick={() => void handleLogin('google')}>
