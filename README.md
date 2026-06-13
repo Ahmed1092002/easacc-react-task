@@ -1,206 +1,146 @@
-# Easacc React Developer Task
+# Easacc React Native Learning Branch
 
-React Vite application for the Easacc task.
+This branch is a clean Expo React Native rebuild of the Easacc task. It is meant to be easy to run and easy to learn from.
 
-The repository has two branches:
+Other branches are still available:
 
-- `main`: React Vite web version without Capacitor.
+- `main`: React Vite web app.
+- `with-capacitor`: React Vite app wrapped with Capacitor.
+- `react-native-expo-learning`: this Expo React Native learning branch.
 
-## Requirements Covered
+## What This App Contains
 
-- Social login page with Google and Facebook actions.
-- Settings page for saving a website URL.
-- Device selector for Bluetooth-capable devices.
-- Web View page that displays the saved website URL.
-- Environment-controlled login mode.
+- Login screen.
+- Settings screen.
+- WebView screen.
+- Demo/mock social login.
+- Saved website URL.
+- Mock device selection.
+- Local persistence with AsyncStorage.
+- React Navigation native stack.
+- WebView rendering with `react-native-webview`.
 
-## Branches
+## Why This Branch Starts Simple
 
-### `main`
+React Native has a different runtime than the browser. Web APIs like `localStorage`, `iframe`, and normal HTML elements do not exist.
 
-This branch is a web-only React Vite app.
+This branch starts with simple React Native equivalents first:
 
-Use this branch when you want the simplest web version:
+- `localStorage` -> `AsyncStorage`
+- `iframe` -> `react-native-webview`
+- HTML elements -> `View`, `Text`, `TextInput`, `Pressable`
+- Browser routing -> React Navigation
+- Real Bluetooth -> mock device service first
+
+Real Bluetooth and full Firebase auth can be added after the basic app flow is clear.
+
+## Install
 
 ```bash
 npm install
-npm run dev
 ```
 
-## Environment Variables
+## Run
 
-Create a real `.env` file from `.env.example`.
+Start Expo:
 
-Important: Vite reads `.env`, not `.env.example`. `.env.example` is only a sample file.
+```bash
+npx expo start
+```
+
+Then choose one option:
+
+- Press `a` for Android emulator.
+- Press `i` for iOS simulator on macOS.
+- Scan the QR code with Expo Go.
+
+You can also use:
+
+```bash
+npm run android
+npm run ios
+npm run web
+```
+
+## Node Version Note
+
+Expo/Metro may warn if Node is older than its preferred patch version.
+
+Recommended:
+
+```text
+Node 22.13.0 or newer
+```
+
+Your current Node may still work, but upgrading removes the warning.
+
+## Environment
+
+Create `.env` from `.env.example`.
 
 ```env
-VITE_USE_FULL_AUTH=false
-VITE_GOOGLE_CLIENT_ID=
-VITE_FACEBOOK_APP_ID=
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
+EXPO_PUBLIC_USE_FULL_AUTH=false
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+EXPO_PUBLIC_GOOGLE_CLIENT_ID=
+EXPO_PUBLIC_FACEBOOK_APP_ID=
 ```
 
-### Auth Mode
+For learning, keep:
 
-`VITE_USE_FULL_AUTH=false`
-
-Uses demo/mock login. This is the default and works without external credentials.
-
-`VITE_USE_FULL_AUTH=true`
-
-Starts Firebase Authentication with Google/Facebook popup sign-in and requires Firebase web configuration:
-
-- `VITE_FIREBASE_API_KEY`
-- `VITE_FIREBASE_AUTH_DOMAIN`
-- `VITE_FIREBASE_PROJECT_ID`
-- `VITE_FIREBASE_STORAGE_BUCKET`
-- `VITE_FIREBASE_MESSAGING_SENDER_ID`
-- `VITE_FIREBASE_APP_ID`
-
-The old direct OAuth variables can stay in `.env.example`, but full login now uses Firebase Auth as the login package.
-
-After changing `.env`, restart the dev server:
-
-```bash
-npm run dev
+```env
+EXPO_PUBLIC_USE_FULL_AUTH=false
 ```
 
-## OAuth Setup
+That makes Google/Facebook buttons use mock users, so the app works immediately.
 
-### Firebase Setup
-
-The project uses the Firebase modular SDK:
-
-```bash
-npm install firebase
-```
-
-Create a Firebase project, add a Web App, and copy the Firebase config values into `.env`.
-
-In Firebase Console:
-
-1. Open `Authentication`.
-2. Open `Sign-in method`.
-3. Enable `Google`.
-4. Enable `Facebook` if you want Facebook login.
-5. Add your local domain in Firebase authorized domains if needed:
+## Project Structure
 
 ```text
-localhost
-127.0.0.1
+App.tsx                 App providers and navigation
+index.ts                Expo entry point
+src/screens             Login, Settings, WebView screens
+src/components          Shared React Native UI pieces
+src/services            Auth, storage, URL, mock device services
+src/state               App context and app actions
+src/types.ts            Shared TypeScript types
+src/theme.ts            Colors and spacing
 ```
 
-### Google Provider
+## Learning Flow
 
-1. Open Google Cloud Console credentials:
-   https://console.cloud.google.com/apis/credentials
-2. Create or select a project.
-3. Create an OAuth Client ID.
-4. Choose `Web application`.
-5. Add Authorized JavaScript origins:
-
-```text
-http://localhost:5173
-http://127.0.0.1:5173
-```
-
-6. Add Authorized redirect URIs:
-
-```text
-http://localhost:5173/login
-http://127.0.0.1:5173/login
-```
-
-7. In Firebase Console, enable the Google provider.
-
-If you use Firebase Auth popup sign-in, Firebase handles most of the client login flow. Google configuration is still needed behind Firebase for production apps.
-
-### Facebook Provider
-
-1. Open Meta for Developers:
-   https://developers.facebook.com/apps/
-2. Create an app.
-3. Go to `App settings` -> `Basic`.
-4. Copy `App ID` and `App Secret`.
-5. In Firebase Console, enable Facebook sign-in.
-6. Paste the Facebook `App ID` and `App Secret` into Firebase.
-7. Copy the OAuth redirect URI shown by Firebase into your Facebook app settings.
-
-The Firebase callback usually looks like:
-
-```text
-https://your-project-id.firebaseapp.com/__/auth/handler
-```
-
-The app also shows its local redirect URI on the login page for manual OAuth troubleshooting:
-
-```text
-http://localhost:5173/login
-```
-
-## Main Features
-
-### Login Page
-
-- Google login button.
-- Facebook login button.
-- Auth mode is shown from `.env`.
-- No UI dropdown is used to switch login mode.
-
-### Settings Page
-
-- Save a website URL.
-- URL is normalized, so `example.com` becomes `https://example.com`.
-- Scan/select a Bluetooth device.
-- Save selected device and URL locally.
-
-### Web View Page
-
-- Loads the saved URL in an iframe on the web branch.
-- Includes fallback buttons to open blocked websites in a new browser tab.
-- Some websites, such as LinkedIn, block iframe embedding for security. That is expected browser behavior.
-
-## Bluetooth Notes
-
-On `main`, Bluetooth uses browser Web Bluetooth support. It works only in supported browsers and usually requires HTTPS or localhost.
-
-On `with-capacitor`, Bluetooth scanning uses the Capacitor Bluetooth LE plugin and is intended for real Android/iOS devices.
+1. Open `App.tsx`.
+2. See how `NavigationContainer` switches between Login and app screens.
+3. Open `src/state/AppContext.tsx`.
+4. See how app state is loaded and saved.
+5. Open `src/screens/LoginScreen.tsx`.
+6. See how demo login creates a mock user.
+7. Open `src/screens/SettingsScreen.tsx`.
+8. Save a URL and load mock devices.
+9. Open `src/screens/WebViewScreen.tsx`.
+10. See how the saved URL is rendered with `react-native-webview`.
 
 ## Commands
 
-Install dependencies:
+Type check:
 
 ```bash
-npm install
+npm run typecheck
 ```
 
-Run local development server:
+Start Expo:
 
 ```bash
-npm run dev
+npm start
 ```
 
-Build production files:
+## Next Lessons
 
-```bash
-npm run build
-```
-
-Preview production build:
-
-```bash
-npm run preview
-```
-
-## Notes For Reviewers
-
-- `main` is intentionally web-only.
-- `with-capacitor` contains the Android/iOS implementation.
-- Demo login is available without credentials.
-- Full OAuth requires real provider app setup.
-- Some websites cannot be embedded in the Web View because of `X-Frame-Options` or Content Security Policy headers.
+- Replace mock device service with real BLE.
+- Add Firebase native/social auth.
+- Add form validation polish.
+- Add loading and offline states.

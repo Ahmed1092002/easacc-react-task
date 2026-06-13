@@ -7,16 +7,20 @@ export type UserProfile = {
   provider: LoginProvider;
 };
 
-export type BluetoothDevice = {
-  deviceId: string;
+export type DeviceOption = {
+  id: string;
   name: string;
-  rssi?: number;
 };
 
 export type AppSettings = {
   authMode: AuthMode;
   currentUser: UserProfile | null;
-  lastLoginProvider: LoginProvider | null;
-  selectedDevice: BluetoothDevice | null;
+  selectedDevice: DeviceOption | null;
   webUrl: string;
+};
+
+export type RootStackParamList = {
+  Login: undefined;
+  Settings: undefined;
+  WebView: undefined;
 };

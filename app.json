@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Easacc React Native Learning",
+    "slug": "easacc-react-native-learning",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "easacclearning",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#176d8f"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

@@ -1,36 +1,27 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { loginWithProvider } from '../services/auth';
-import {
-  loadAppSettings,
-  saveCurrentUser,
-  saveSelectedDevice,
-  saveWebUrl,
-} from '../services/settingsStorage';
-import type { AppSettings, AuthMode, BluetoothDevice, LoginProvider, UserProfile } from '../types';
+import { loadAppSettings, saveCurrentUser, saveSelectedDevice, saveWebUrl } from '../services/storage';
+import type { AppSettings, DeviceOption, LoginProvider, UserProfile } from '../types';
 
-type AppContextValue = {
-  authMode: AuthMode;
-  currentUser: UserProfile | null;
+type AppContextValue = AppSettings & {
   isReady: boolean;
-  lastLoginProvider: LoginProvider | null;
-  selectedDevice: BluetoothDevice | null;
-  setSelectedDevice: (device: BluetoothDevice | null) => Promise<void>;
+  setSelectedDevice: (device: DeviceOption | null) => Promise<void>;
   setWebUrl: (url: string) => Promise<void>;
-  signIn: (provider: LoginProvider) => Promise<UserProfile>;
+  signIn: (provider: LoginProvider) => Promise<void>;
   signOut: () => Promise<void>;
-  webUrl: string;
 };
 
 const AppContext = createContext<AppContextValue | null>(null);
 
+const initialSettings: AppSettings = {
+  authMode: 'demo',
+  currentUser: null,
+  selectedDevice: null,
+  webUrl: '',
+};
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<AppSettings>({
-    authMode: 'demo',
-    currentUser: null,
-    lastLoginProvider: null,
-    selectedDevice: null,
-    webUrl: '',
-  });
+  const [settings, setSettings] = useState<AppSettings>(initialSettings);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -41,12 +32,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<AppContextValue>(
     () => ({
-      authMode: settings.authMode,
-      currentUser: settings.currentUser,
+      ...settings,
       isReady,
-      lastLoginProvider: settings.lastLoginProvider,
-      selectedDevice: settings.selectedDevice,
-      webUrl: settings.webUrl,
       async setSelectedDevice(device) {
         await saveSelectedDevice(device);
         setSettings((current) => ({ ...current, selectedDevice: device }));
@@ -58,23 +45,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       async signIn(provider) {
         const user = await loginWithProvider(provider, settings.authMode);
         await saveCurrentUser(user, provider);
-        setSettings((current) => ({
-          ...current,
-          currentUser: user,
-          lastLoginProvider: provider,
-        }));
-        return user;
+        setSettings((current) => ({ ...current, currentUser: user }));
       },
       async signOut() {
         await saveCurrentUser(null, null);
-        setSettings((current) => ({
-          ...current,
-          currentUser: null,
-          lastLoginProvider: null,
-        }));
+        setSettings((current) => ({ ...current, currentUser: null }));
       },
     }),
-    [isReady, settings.authMode, settings.currentUser, settings.lastLoginProvider, settings.selectedDevice, settings.webUrl],
+    [isReady, settings],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

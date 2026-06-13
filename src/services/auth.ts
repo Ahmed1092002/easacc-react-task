@@ -1,5 +1,4 @@
-import { FacebookAuthProvider, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { assertFirebaseConfig, firebaseAuth } from './firebase';
+import { getFirebaseConfig } from './env';
 import type { AuthMode, LoginProvider, UserProfile } from '../types';
 
 const providerLabels: Record<LoginProvider, string> = {
@@ -7,26 +6,10 @@ const providerLabels: Record<LoginProvider, string> = {
   google: 'Google',
 };
 
-export function getConfiguredAuthMode(): AuthMode {
-  return import.meta.env.VITE_USE_FULL_AUTH === 'true' ? 'full' : 'demo';
-}
-
-export function getOAuthRedirectUri(): string {
-  return `${window.location.origin}/login`;
-}
-
-function createProvider(provider: LoginProvider) {
-  if (provider === 'google') {
-    const googleProvider = new GoogleAuthProvider();
-    googleProvider.addScope('email');
-    googleProvider.addScope('profile');
-    return googleProvider;
-  }
-
-  const facebookProvider = new FacebookAuthProvider();
-  facebookProvider.addScope('email');
-  facebookProvider.addScope('public_profile');
-  return facebookProvider;
+function getMissingFirebaseKeys() {
+  return Object.entries(getFirebaseConfig())
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
 }
 
 export async function loginWithProvider(provider: LoginProvider, authMode: AuthMode): Promise<UserProfile> {
@@ -38,14 +21,12 @@ export async function loginWithProvider(provider: LoginProvider, authMode: AuthM
     };
   }
 
-  assertFirebaseConfig();
+  const missingKeys = getMissingFirebaseKeys();
+  if (missingKeys.length > 0) {
+    throw new Error(`Firebase full auth is missing: ${missingKeys.join(', ')}.`);
+  }
 
-  const credential = await signInWithPopup(firebaseAuth, createProvider(provider));
-  const { user } = credential;
-
-  return {
-    email: user.email ?? `${provider}@firebase.local`,
-    name: user.displayName ?? `${providerLabels[provider]} User`,
-    provider,
-  };
+  throw new Error(
+    `${providerLabels[provider]} full auth is prepared for a later lesson. Switch EXPO_PUBLIC_USE_FULL_AUTH=false to keep learning with demo login.`,
+  );
 }

@@ -2,7 +2,7 @@ export function normalizeUrl(value: string): string {
   const trimmed = value.trim();
 
   if (!trimmed) {
-    throw new Error('Please enter a web URL.');
+    throw new Error('Please enter a website URL.');
   }
 
   const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;

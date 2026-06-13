@@ -1,41 +1,40 @@
-import { getConfiguredAuthMode } from './auth';
-import type { AppSettings, BluetoothDevice, LoginProvider, UserProfile } from '../types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getConfiguredAuthMode } from './env';
+import type { AppSettings, DeviceOption, LoginProvider, UserProfile } from '../types';
 
 const keys = {
-  authMode: 'authMode',
-  currentUser: 'demoUser',
+  currentUser: 'currentUser',
   lastLoginProvider: 'lastLoginProvider',
   selectedDevice: 'selectedDevice',
   webUrl: 'webUrl',
 } as const;
 
 async function getJson<T>(key: string): Promise<T | null> {
-  const value = window.localStorage.getItem(key);
+  const value = await AsyncStorage.getItem(key);
   return value ? (JSON.parse(value) as T) : null;
 }
 
 async function setJson<T>(key: string, value: T | null) {
   if (value === null) {
-    window.localStorage.removeItem(key);
+    await AsyncStorage.removeItem(key);
     return;
   }
 
-  window.localStorage.setItem(key, JSON.stringify(value));
+  await AsyncStorage.setItem(key, JSON.stringify(value));
 }
 
 export async function loadAppSettings(): Promise<AppSettings> {
-  const [currentUser, selectedDevice, lastLoginProvider] = await Promise.all([
+  const [currentUser, selectedDevice, webUrl] = await Promise.all([
     getJson<UserProfile>(keys.currentUser),
-    getJson<BluetoothDevice>(keys.selectedDevice),
-    getJson<LoginProvider>(keys.lastLoginProvider),
+    getJson<DeviceOption>(keys.selectedDevice),
+    AsyncStorage.getItem(keys.webUrl),
   ]);
 
   return {
     authMode: getConfiguredAuthMode(),
     currentUser,
-    lastLoginProvider,
     selectedDevice,
-    webUrl: window.localStorage.getItem(keys.webUrl) ?? '',
+    webUrl: webUrl ?? '',
   };
 }
 
@@ -43,10 +42,10 @@ export async function saveCurrentUser(user: UserProfile | null, provider: LoginP
   await Promise.all([setJson(keys.currentUser, user), setJson(keys.lastLoginProvider, provider)]);
 }
 
-export async function saveSelectedDevice(device: BluetoothDevice | null) {
+export async function saveSelectedDevice(device: DeviceOption | null) {
   await setJson(keys.selectedDevice, device);
 }
 
 export async function saveWebUrl(webUrl: string) {
-  window.localStorage.setItem(keys.webUrl, webUrl);
+  await AsyncStorage.setItem(keys.webUrl, webUrl);
 }
