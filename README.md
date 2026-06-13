@@ -5,7 +5,6 @@ React Vite application for the Easacc task.
 The repository has two branches:
 
 - `main`: React Vite web version without Capacitor.
-- `with-capacitor`: Android/iOS version using Capacitor.
 
 ## Requirements Covered
 
@@ -19,42 +18,14 @@ The repository has two branches:
 
 ### `main`
 
-This branch is a web-only React Vite app. It does not include Capacitor, Android, or iOS native folders.
+This branch is a web-only React Vite app.
 
 Use this branch when you want the simplest web version:
 
 ```bash
-git switch main
 npm install
 npm run dev
 ```
-
-### `with-capacitor`
-
-This branch keeps the Capacitor setup for Android and iOS.
-
-Use this branch when you want the mobile app wrapper:
-
-```bash
-git switch with-capacitor
-npm install
-npm run build
-npx cap sync
-```
-
-Android:
-
-```bash
-npx cap run android
-```
-
-iOS:
-
-```bash
-npx cap run ios
-```
-
-iOS requires macOS and Xcode.
 
 ## Environment Variables
 
