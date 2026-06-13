@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Easacc React Task</string>
-    <string name="title_activity_main">Easacc React Task</string>
-    <string name="package_name">com.easacc.reacttask</string>
-    <string name="custom_url_scheme">com.easacc.reacttask</string>
-</resources>

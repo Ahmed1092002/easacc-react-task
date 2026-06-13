@@ -1,5 +1,5 @@
-import { Preferences } from '@capacitor/preferences';
-import type { AppSettings, AuthMode, BluetoothDevice, LoginProvider, UserProfile } from '../types';
+import { getConfiguredAuthMode } from './auth';
+import type { AppSettings, BluetoothDevice, LoginProvider, UserProfile } from '../types';
 
 const keys = {
   authMode: 'authMode',
@@ -10,39 +10,33 @@ const keys = {
 } as const;
 
 async function getJson<T>(key: string): Promise<T | null> {
-  const { value } = await Preferences.get({ key });
+  const value = window.localStorage.getItem(key);
   return value ? (JSON.parse(value) as T) : null;
 }
 
 async function setJson<T>(key: string, value: T | null) {
   if (value === null) {
-    await Preferences.remove({ key });
+    window.localStorage.removeItem(key);
     return;
   }
 
-  await Preferences.set({ key, value: JSON.stringify(value) });
+  window.localStorage.setItem(key, JSON.stringify(value));
 }
 
 export async function loadAppSettings(): Promise<AppSettings> {
-  const [{ value: authModeValue }, { value: webUrlValue }, currentUser, selectedDevice, lastLoginProvider] = await Promise.all([
-    Preferences.get({ key: keys.authMode }),
-    Preferences.get({ key: keys.webUrl }),
+  const [currentUser, selectedDevice, lastLoginProvider] = await Promise.all([
     getJson<UserProfile>(keys.currentUser),
     getJson<BluetoothDevice>(keys.selectedDevice),
     getJson<LoginProvider>(keys.lastLoginProvider),
   ]);
 
   return {
-    authMode: authModeValue === 'full' ? 'full' : 'demo',
+    authMode: getConfiguredAuthMode(),
     currentUser,
     lastLoginProvider,
     selectedDevice,
-    webUrl: webUrlValue ?? '',
+    webUrl: window.localStorage.getItem(keys.webUrl) ?? '',
   };
-}
-
-export async function saveAuthMode(authMode: AuthMode) {
-  await Preferences.set({ key: keys.authMode, value: authMode });
 }
 
 export async function saveCurrentUser(user: UserProfile | null, provider: LoginProvider | null) {
@@ -54,5 +48,5 @@ export async function saveSelectedDevice(device: BluetoothDevice | null) {
 }
 
 export async function saveWebUrl(webUrl: string) {
-  await Preferences.set({ key: keys.webUrl, value: webUrl });
+  window.localStorage.setItem(keys.webUrl, webUrl);
 }

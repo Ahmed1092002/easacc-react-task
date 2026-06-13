@@ -4,7 +4,7 @@ import { useApp } from '../state/AppContext';
 import type { LoginProvider } from '../types';
 
 export default function LoginPage() {
-  const { authMode, currentUser, setAuthMode, signIn, signOut } = useApp();
+  const { authMode, currentUser, signIn, signOut } = useApp();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState<LoginProvider | null>(null);
@@ -32,17 +32,7 @@ export default function LoginPage() {
           <p className="muted">Sign in, choose the website URL, select a nearby device, and open the site in the app.</p>
         </div>
 
-        <label className="field-label" htmlFor="authMode">
-          Authentication mode
-        </label>
-        <select
-          id="authMode"
-          value={authMode}
-          onChange={(event) => void setAuthMode(event.target.value === 'full' ? 'full' : 'demo')}
-        >
-          <option value="demo">Demo mode</option>
-          <option value="full">Full OAuth mode</option>
-        </select>
+        <p className="mode-pill">Auth mode: {authMode === 'full' ? 'Full OAuth' : 'Demo mock'}</p>
 
         <div className="button-stack">
           <button type="button" className="provider-button google" onClick={() => void handleLogin('google')}>

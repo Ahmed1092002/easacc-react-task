@@ -220,6 +220,15 @@ h2 {
   margin: 0;
 }
 
+.mode-pill {
+  border-radius: 8px;
+  background: #eef6f2;
+  color: #17633d;
+  font-weight: 800;
+  margin: 0;
+  padding: 12px 14px;
+}
+
 .bottom-nav {
   position: fixed;
   right: 0;

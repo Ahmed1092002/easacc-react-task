@@ -6,7 +6,7 @@ import { useApp } from '../state/AppContext';
 import type { BluetoothDevice } from '../types';
 
 export default function SettingsPage() {
-  const { authMode, currentUser, selectedDevice, setAuthMode, setSelectedDevice, setWebUrl, signOut, webUrl } = useApp();
+  const { authMode, currentUser, selectedDevice, setSelectedDevice, setWebUrl, signOut, webUrl } = useApp();
   const navigate = useNavigate();
   const [urlInput, setUrlInput] = useState(webUrl);
   const [devices, setDevices] = useState<BluetoothDevice[]>(selectedDevice ? [selectedDevice] : []);
@@ -100,17 +100,7 @@ export default function SettingsPage() {
           <h2>Authentication</h2>
           <p className="muted">Demo mode works without external provider credentials.</p>
         </div>
-        <label className="field-label" htmlFor="settingsAuthMode">
-          Authentication mode
-        </label>
-        <select
-          id="settingsAuthMode"
-          value={authMode}
-          onChange={(event) => void setAuthMode(event.target.value === 'full' ? 'full' : 'demo')}
-        >
-          <option value="demo">Demo mode</option>
-          <option value="full">Full OAuth mode</option>
-        </select>
+        <p className="mode-pill">Current mode: {authMode === 'full' ? 'Full OAuth' : 'Demo mock'}</p>
         {currentUser ? <p className="saved-url">Signed in as {currentUser.email}</p> : null}
       </section>
 

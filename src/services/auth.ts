@@ -5,6 +5,10 @@ const providerLabels: Record<LoginProvider, string> = {
   google: 'Google',
 };
 
+export function getConfiguredAuthMode(): AuthMode {
+  return import.meta.env.VITE_USE_FULL_AUTH === 'true' ? 'full' : 'demo';
+}
+
 function openOAuthWindow(provider: LoginProvider) {
   const redirectUri = `${window.location.origin}/login`;
   const authUrl =

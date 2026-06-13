@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+android/
+ios/
+capacitor.config.ts
 
 # Editor directories and files
 .vscode/*

@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { loginWithProvider } from '../services/auth';
 import {
   loadAppSettings,
-  saveAuthMode,
   saveCurrentUser,
   saveSelectedDevice,
   saveWebUrl,
@@ -15,7 +14,6 @@ type AppContextValue = {
   isReady: boolean;
   lastLoginProvider: LoginProvider | null;
   selectedDevice: BluetoothDevice | null;
-  setAuthMode: (authMode: AuthMode) => Promise<void>;
   setSelectedDevice: (device: BluetoothDevice | null) => Promise<void>;
   setWebUrl: (url: string) => Promise<void>;
   signIn: (provider: LoginProvider) => Promise<UserProfile>;
@@ -49,10 +47,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       lastLoginProvider: settings.lastLoginProvider,
       selectedDevice: settings.selectedDevice,
       webUrl: settings.webUrl,
-      async setAuthMode(authMode) {
-        await saveAuthMode(authMode);
-        setSettings((current) => ({ ...current, authMode }));
-      },
       async setSelectedDevice(device) {
         await saveSelectedDevice(device);
         setSettings((current) => ({ ...current, selectedDevice: device }));
