@@ -1,3 +1,5 @@
+import { FacebookAuthProvider, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { assertFirebaseConfig, firebaseAuth } from './firebase';
 import type { AuthMode, LoginProvider, UserProfile } from '../types';
 
 const providerLabels: Record<LoginProvider, string> = {
@@ -13,27 +15,18 @@ export function getOAuthRedirectUri(): string {
   return `${window.location.origin}/login`;
 }
 
-function openOAuthWindow(provider: LoginProvider) {
-  const redirectUri = getOAuthRedirectUri();
-  const authUrl =
-    provider === 'google'
-      ? new URL('https://accounts.google.com/o/oauth2/v2/auth')
-      : new URL('https://www.facebook.com/v19.0/dialog/oauth');
-
+function createProvider(provider: LoginProvider) {
   if (provider === 'google') {
-    authUrl.searchParams.set('client_id', import.meta.env.VITE_GOOGLE_CLIENT_ID);
-    authUrl.searchParams.set('redirect_uri', redirectUri);
-    authUrl.searchParams.set('response_type', 'token');
-    authUrl.searchParams.set('scope', 'openid email profile');
-    authUrl.searchParams.set('prompt', 'select_account');
-  } else {
-    authUrl.searchParams.set('client_id', import.meta.env.VITE_FACEBOOK_APP_ID);
-    authUrl.searchParams.set('redirect_uri', redirectUri);
-    authUrl.searchParams.set('response_type', 'token');
-    authUrl.searchParams.set('scope', 'email,public_profile');
+    const googleProvider = new GoogleAuthProvider();
+    googleProvider.addScope('email');
+    googleProvider.addScope('profile');
+    return googleProvider;
   }
 
-  window.open(authUrl.toString(), '_blank', 'noopener,noreferrer,width=480,height=720');
+  const facebookProvider = new FacebookAuthProvider();
+  facebookProvider.addScope('email');
+  facebookProvider.addScope('public_profile');
+  return facebookProvider;
 }
 
 export async function loginWithProvider(provider: LoginProvider, authMode: AuthMode): Promise<UserProfile> {
@@ -45,16 +38,14 @@ export async function loginWithProvider(provider: LoginProvider, authMode: AuthM
     };
   }
 
-  const missingCredential =
-    provider === 'google' ? !import.meta.env.VITE_GOOGLE_CLIENT_ID : !import.meta.env.VITE_FACEBOOK_APP_ID;
+  assertFirebaseConfig();
 
-  if (missingCredential) {
-    throw new Error(`Full ${providerLabels[provider]} login is not configured. Switch to demo mode or add credentials.`);
-  }
+  const credential = await signInWithPopup(firebaseAuth, createProvider(provider));
+  const { user } = credential;
 
-  openOAuthWindow(provider);
-
-  throw new Error(
-    `${providerLabels[provider]} login was opened. Complete the production callback configuration to read the returned token.`,
-  );
+  return {
+    email: user.email ?? `${provider}@firebase.local`,
+    name: user.displayName ?? `${providerLabels[provider]} User`,
+    provider,
+  };
 }

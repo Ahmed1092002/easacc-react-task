@@ -5,7 +5,6 @@ React Vite application for the Easacc task.
 The repository has two branches:
 
 - `main`: React Vite web version without Capacitor.
-- `with-capacitor`: Android/iOS version using Capacitor.
 
 ## Requirements Covered
 
@@ -19,42 +18,14 @@ The repository has two branches:
 
 ### `main`
 
-This branch is a web-only React Vite app. It does not include Capacitor, Android, or iOS native folders.
+This branch is a web-only React Vite app.
 
 Use this branch when you want the simplest web version:
 
 ```bash
-git switch main
 npm install
 npm run dev
 ```
-
-### `with-capacitor`
-
-This branch keeps the Capacitor setup for Android and iOS.
-
-Use this branch when you want the mobile app wrapper:
-
-```bash
-git switch with-capacitor
-npm install
-npm run build
-npx cap sync
-```
-
-Android:
-
-```bash
-npx cap run android
-```
-
-iOS:
-
-```bash
-npx cap run ios
-```
-
-iOS requires macOS and Xcode.
 
 ## Environment Variables
 
@@ -66,6 +37,12 @@ Important: Vite reads `.env`, not `.env.example`. `.env.example` is only a sampl
 VITE_USE_FULL_AUTH=false
 VITE_GOOGLE_CLIENT_ID=
 VITE_FACEBOOK_APP_ID=
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
 ```
 
 ### Auth Mode
@@ -76,12 +53,16 @@ Uses demo/mock login. This is the default and works without external credentials
 
 `VITE_USE_FULL_AUTH=true`
 
-Starts the Google/Facebook OAuth flow and requires:
+Starts Firebase Authentication with Google/Facebook popup sign-in and requires Firebase web configuration:
 
-- `VITE_GOOGLE_CLIENT_ID`
-- `VITE_FACEBOOK_APP_ID`
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
 
-The project opens provider authorization URLs, but production token callback handling still needs real provider configuration.
+The old direct OAuth variables can stay in `.env.example`, but full login now uses Firebase Auth as the login package.
 
 After changing `.env`, restart the dev server:
 
@@ -91,7 +72,30 @@ npm run dev
 
 ## OAuth Setup
 
-### Google Client ID
+### Firebase Setup
+
+The project uses the Firebase modular SDK:
+
+```bash
+npm install firebase
+```
+
+Create a Firebase project, add a Web App, and copy the Firebase config values into `.env`.
+
+In Firebase Console:
+
+1. Open `Authentication`.
+2. Open `Sign-in method`.
+3. Enable `Google`.
+4. Enable `Facebook` if you want Facebook login.
+5. Add your local domain in Firebase authorized domains if needed:
+
+```text
+localhost
+127.0.0.1
+```
+
+### Google Provider
 
 1. Open Google Cloud Console credentials:
    https://console.cloud.google.com/apis/credentials
@@ -112,32 +116,31 @@ http://localhost:5173/login
 http://127.0.0.1:5173/login
 ```
 
-7. Copy the generated Client ID into `.env`:
+7. In Firebase Console, enable the Google provider.
 
-```env
-VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-```
+If you use Firebase Auth popup sign-in, Firebase handles most of the client login flow. Google configuration is still needed behind Firebase for production apps.
 
-The login page shows the exact redirect URI used by the app. If Google shows `redirect_uri_mismatch`, add that exact URI to the OAuth Client ID settings.
-
-### Facebook App ID
+### Facebook Provider
 
 1. Open Meta for Developers:
    https://developers.facebook.com/apps/
 2. Create an app.
 3. Go to `App settings` -> `Basic`.
-4. Copy `App ID`.
-5. Add Facebook Login if needed.
-6. Add the valid OAuth redirect URI:
+4. Copy `App ID` and `App Secret`.
+5. In Firebase Console, enable Facebook sign-in.
+6. Paste the Facebook `App ID` and `App Secret` into Firebase.
+7. Copy the OAuth redirect URI shown by Firebase into your Facebook app settings.
+
+The Firebase callback usually looks like:
+
+```text
+https://your-project-id.firebaseapp.com/__/auth/handler
+```
+
+The app also shows its local redirect URI on the login page for manual OAuth troubleshooting:
 
 ```text
 http://localhost:5173/login
-```
-
-7. Add it to `.env`:
-
-```env
-VITE_FACEBOOK_APP_ID=your-facebook-app-id
 ```
 
 ## Main Features
