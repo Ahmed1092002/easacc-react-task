@@ -30,7 +30,6 @@ export default function LoginPage() {
     <main className="screen login-screen">
       <section className="login-panel">
         <div>
-          <p className="eyebrow">React developer task</p>
           <h1>Easacc Mobile Portal</h1>
           <p className="muted">Sign in, choose the website URL, select a nearby device, and open the site in the app.</p>
         </div>
