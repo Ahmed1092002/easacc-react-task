@@ -17,6 +17,7 @@ Other branches are still available:
 - Demo/mock social login.
 - Saved website URL.
 - Mock WiFi and Bluetooth printer discovery.
+- Real Bluetooth scan support for development builds.
 - Local persistence with AsyncStorage.
 - React Navigation native stack.
 - WebView rendering with `react-native-webview`.
@@ -177,15 +178,47 @@ The mock service returns printer-like devices with:
 - signal strength
 - paired/reachable state
 
-This keeps the app runnable in Expo Go while you learn the React Native flow.
+This keeps the app runnable in Expo Go while you learn the React Native flow. The app also includes a real BLE scan path with `react-native-ble-plx`, but that path only works in a native development build.
 
 For real device discovery later:
 
-- Bluetooth printers usually need `react-native-ble-plx` or another BLE/native Bluetooth package.
+- Bluetooth printers use `react-native-ble-plx` in this branch.
 - WiFi printer discovery usually needs mDNS/Bonjour, local network scanning, printer SDKs, or a backend service.
-- These native features normally require an Expo development build, not plain Expo Go.
+- Native Bluetooth requires an Expo development build, not plain Expo Go.
 - Android needs Bluetooth and sometimes location permissions.
 - iOS needs Bluetooth and local network usage descriptions in native config.
+
+## Real Bluetooth Development Build
+
+Real Bluetooth scanning cannot run inside the normal Expo Go app because Expo Go does not include the native BLE module.
+
+Use this flow when you are ready to test real Bluetooth on Android:
+
+```bash
+npx expo prebuild
+npx expo run:android
+```
+
+After the development app is installed on the phone, start Metro with:
+
+```bash
+npx expo start --dev-client --lan --clear
+```
+
+Then open the installed development app, not Expo Go.
+
+Bluetooth files to learn from:
+
+```text
+src/services/deviceService.ts
+app.json
+```
+
+Current behavior:
+
+- In a development build, the app requests Bluetooth permissions and scans nearby BLE devices.
+- In Expo Go, the app shows demo printer devices and explains that native BLE needs a development build.
+- WiFi printers are still mocked because WiFi printer discovery is a different feature from Bluetooth scanning.
 
 ## Commands
 
@@ -203,7 +236,7 @@ npm start
 
 ## Next Lessons
 
-- Replace mock device service with real WiFi/Bluetooth discovery.
+- Replace mocked WiFi printer discovery with mDNS, printer SDK, or backend discovery.
 - Add Firebase native/social auth.
 - Add form validation polish.
 - Add loading and offline states.
