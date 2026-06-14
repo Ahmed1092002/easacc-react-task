@@ -1,9 +1,11 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { ActivityIndicator, Linking, StyleSheet, Text, View } from 'react-native';
 import WebView from 'react-native-webview';
 import AppButton from '../components/AppButton';
 import Screen from '../components/Screen';
 import SectionCard from '../components/SectionCard';
+import StatusMessage from '../components/StatusMessage';
 import { getDeviceDescription, getDeviceLabel } from '../services/deviceService';
 import { colors, spacing } from '../theme';
 import { useApp } from '../state/AppContext';
@@ -13,6 +15,9 @@ type WebViewScreenProps = NativeStackScreenProps<RootStackParamList, 'WebView'>;
 
 export default function WebViewScreen({ navigation }: WebViewScreenProps) {
   const { selectedDevice, webUrl } = useApp();
+  const webViewRef = useRef<WebView>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   if (!webUrl) {
     return (
@@ -32,7 +37,17 @@ export default function WebViewScreen({ navigation }: WebViewScreenProps) {
           <Text style={styles.title}>{webUrl}</Text>
           {selectedDevice ? <Text style={styles.subtitle}>Printer: {getDeviceLabel(selectedDevice)}</Text> : null}
         </View>
-        <AppButton label="Open externally" onPress={() => void Linking.openURL(webUrl)} variant="secondary" />
+        <View style={styles.headerActions}>
+          <AppButton
+            label="Refresh"
+            onPress={() => {
+              setLoadError('');
+              webViewRef.current?.reload();
+            }}
+            variant="secondary"
+          />
+          <AppButton label="Open externally" onPress={() => void Linking.openURL(webUrl)} variant="secondary" />
+        </View>
       </View>
       {selectedDevice ? (
         <View style={styles.deviceBar}>
@@ -41,8 +56,28 @@ export default function WebViewScreen({ navigation }: WebViewScreenProps) {
         </View>
       ) : null}
       <Text style={styles.note}>Some websites block embedded views. Use external open if the page refuses to load.</Text>
+      <StatusMessage tone="error" message={loadError} />
+      {isLoading ? (
+        <View style={styles.loadingBar}>
+          <ActivityIndicator color={colors.primary} />
+          <Text style={styles.loadingText}>Loading website...</Text>
+        </View>
+      ) : null}
       <View style={styles.webviewBox}>
-        <WebView source={{ uri: webUrl }} startInLoadingState />
+        <WebView
+          ref={webViewRef}
+          onError={() => {
+            setIsLoading(false);
+            setLoadError('The website could not load inside the app. Try opening it externally.');
+          }}
+          onLoadEnd={() => setIsLoading(false)}
+          onLoadStart={() => {
+            setLoadError('');
+            setIsLoading(true);
+          }}
+          source={{ uri: webUrl }}
+          startInLoadingState
+        />
       </View>
     </View>
   );
@@ -73,6 +108,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     gap: spacing.md,
     padding: spacing.lg,
+  },
+  headerActions: {
+    gap: spacing.sm,
+  },
+  loadingBar: {
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  loadingText: {
+    color: colors.muted,
+    fontWeight: '800',
   },
   note: {
     backgroundColor: '#eef8fb',

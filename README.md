@@ -39,6 +39,17 @@ Other branches are still available:
    - `src/screens/WebViewScreen.tsx`
    - The saved URL opens inside `react-native-webview`.
    - The selected printer is shown as context above the WebView.
+   - Refresh and external open fallback are available.
+
+## Submission Checklist
+
+- Login page has Facebook and Google actions.
+- Settings page saves a user-editable web URL.
+- Settings page shows WiFi and Bluetooth printer-style devices in a dropdown.
+- WebView page loads the saved URL.
+- Selected device and URL are persisted locally with AsyncStorage.
+- Demo mode works without real OAuth credentials.
+- Full auth and real device discovery are documented as next native steps.
 
 ## Why This Branch Starts Simple
 
