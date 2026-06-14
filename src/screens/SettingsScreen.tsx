@@ -50,7 +50,7 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
       const result = await scanForNetworkDevices();
       setDevices(result.devices);
       setIsDeviceDropdownOpen(result.devices.length > 0);
-      setDeviceMessage(result.devices.length === 0 ? 'No WiFi or Bluetooth printers found.' : result.note);
+      setDeviceMessage(result.devices.length === 0 ? 'No Bluetooth devices found.' : result.note);
     } finally {
       setIsScanning(false);
     }
@@ -98,11 +98,11 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
 
       <SectionCard
         title="Network Device"
-        description="Scan for nearby WiFi and Bluetooth printers, then choose one from the dropdown."
+        description="Scan for nearby Bluetooth devices, then choose one from the dropdown."
       >
         <AppButton
           disabled={isScanning}
-          label={isScanning ? 'Scanning WiFi and Bluetooth...' : 'Scan printers'}
+          label={isScanning ? 'Scanning Bluetooth...' : 'Scan Bluetooth'}
           onPress={() => void handleScanDevices()}
           variant="secondary"
         />
@@ -120,7 +120,7 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
         {isDeviceDropdownOpen ? (
           <View style={styles.dropdownList}>
             {devices.length === 0 ? (
-              <Text style={styles.emptyDropdown}>Scan first to load nearby printers.</Text>
+              <Text style={styles.emptyDropdown}>Scan first to load real Bluetooth devices.</Text>
             ) : (
               devices.map((device) => (
                 <Pressable

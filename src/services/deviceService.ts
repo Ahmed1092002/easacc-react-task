@@ -8,59 +8,8 @@ export type DeviceScanResult = {
 
 const BLUETOOTH_SCAN_MS = 7000;
 
-const mockNetworkPrinters: DeviceOption[] = [
-  {
-    address: '192.168.1.45',
-    id: 'wifi-epson-office-01',
-    isReachable: true,
-    name: 'Epson Office WiFi Printer',
-    protocol: 'wifi',
-    signalStrength: 88,
-  },
-  {
-    address: 'BT:58:9A:22:10:7F',
-    id: 'bt-receipt-front-desk',
-    isPaired: true,
-    isReachable: true,
-    name: 'Front Desk Bluetooth Receipt Printer',
-    protocol: 'bluetooth',
-    signalStrength: 74,
-  },
-  {
-    address: '192.168.1.62',
-    id: 'wifi-zebra-label-02',
-    isReachable: true,
-    name: 'Zebra WiFi Label Printer',
-    protocol: 'wifi',
-    signalStrength: 67,
-  },
-  {
-    address: 'BT:41:0C:EF:88:31',
-    id: 'bt-portable-printer-03',
-    isPaired: false,
-    isReachable: false,
-    name: 'Portable Bluetooth Printer',
-    protocol: 'bluetooth',
-    signalStrength: 39,
-  },
-];
-
 export async function scanForNetworkDevices(): Promise<DeviceScanResult> {
-  const bluetoothScan = await scanForBluetoothDevices();
-
-  if (bluetoothScan.devices.length > 0) {
-    return {
-      devices: [...mockNetworkPrinters.filter((device) => device.protocol === 'wifi'), ...bluetoothScan.devices],
-      note: bluetoothScan.note,
-    };
-  }
-
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  return {
-    devices: mockNetworkPrinters,
-    note: `${bluetoothScan.note} Demo WiFi and Bluetooth printers are shown as fallback.`,
-  };
+  return scanForBluetoothDevices();
 }
 
 export function getDeviceLabel(device: DeviceOption) {
@@ -137,13 +86,13 @@ async function scanForBluetoothDevices(): Promise<DeviceScanResult> {
       note:
         devices.length === 0
           ? 'Real Bluetooth scan finished, but no nearby BLE devices were found.'
-          : 'Real Bluetooth scan finished. Select a discovered Bluetooth device or a WiFi printer.',
+          : 'Real Bluetooth scan finished. Select a discovered Bluetooth device.',
     };
   } catch {
     return {
       devices: [],
       note:
-        'Real Bluetooth scanning needs a development build with native BLE support. Expo Go cannot run this native module.',
+        'Real Bluetooth scanning needs a development build with native BLE support. No mock devices are shown.',
     };
   }
 }

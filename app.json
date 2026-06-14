@@ -7,7 +7,9 @@
     "scheme": "easacclearning",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -24,7 +26,8 @@
       ],
       "adaptiveIcon": {
         "backgroundColor": "#176d8f"
-      }
+      },
+      "package": "com.anonymous.easaccreactnativelearning"
     },
     "web": {
       "bundler": "metro"
