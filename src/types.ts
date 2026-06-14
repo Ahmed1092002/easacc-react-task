@@ -8,8 +8,13 @@ export type UserProfile = {
 };
 
 export type DeviceOption = {
+  address: string;
   id: string;
+  isPaired?: boolean;
+  isReachable?: boolean;
   name: string;
+  protocol: 'wifi' | 'bluetooth';
+  signalStrength?: number;
 };
 
 export type AppSettings = {

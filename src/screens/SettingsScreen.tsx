@@ -1,12 +1,12 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import AppButton from '../components/AppButton';
 import AuthModeBadge from '../components/AuthModeBadge';
 import Screen from '../components/Screen';
 import SectionCard from '../components/SectionCard';
 import StatusMessage from '../components/StatusMessage';
-import { scanForDevices } from '../services/deviceService';
+import { getDeviceDescription, getDeviceLabel, scanForNetworkDevices } from '../services/deviceService';
 import { normalizeUrl } from '../services/url';
 import { colors, spacing } from '../theme';
 import { useApp } from '../state/AppContext';
@@ -19,6 +19,7 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
   const [urlInput, setUrlInput] = useState(webUrl);
   const [devices, setDevices] = useState<DeviceOption[]>(selectedDevice ? [selectedDevice] : []);
   const [deviceMessage, setDeviceMessage] = useState('');
+  const [isDeviceDropdownOpen, setIsDeviceDropdownOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [urlError, setUrlError] = useState('');
   const [urlSuccess, setUrlSuccess] = useState('');
@@ -46,12 +47,19 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
     setIsScanning(true);
 
     try {
-      const results = await scanForDevices();
-      setDevices(results);
-      setDeviceMessage(results.length === 0 ? 'No devices found.' : 'Mock devices loaded.');
+      const result = await scanForNetworkDevices();
+      setDevices(result.devices);
+      setIsDeviceDropdownOpen(result.devices.length > 0);
+      setDeviceMessage(result.devices.length === 0 ? 'No WiFi or Bluetooth printers found.' : result.note);
     } finally {
       setIsScanning(false);
     }
+  }
+
+  async function handleSelectDevice(device: DeviceOption) {
+    await setSelectedDevice(device);
+    setIsDeviceDropdownOpen(false);
+    setDeviceMessage(`${getDeviceLabel(device)} selected.`);
   }
 
   return (
@@ -88,22 +96,59 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
         {currentUser ? <Text style={styles.savedText}>Signed in as {currentUser.email}</Text> : null}
       </SectionCard>
 
-      <SectionCard title="Mock Devices" description="This learning branch uses mock devices before adding real Bluetooth.">
+      <SectionCard
+        title="Network Device"
+        description="Scan for nearby WiFi and Bluetooth printers, then choose one from the dropdown."
+      >
         <AppButton
           disabled={isScanning}
-          label={isScanning ? 'Scanning...' : 'Load mock devices'}
+          label={isScanning ? 'Scanning WiFi and Bluetooth...' : 'Scan printers'}
           onPress={() => void handleScanDevices()}
           variant="secondary"
         />
-        {devices.map((device) => (
-          <AppButton
-            key={device.id}
-            label={selectedDevice?.id === device.id ? `Selected: ${device.name}` : device.name}
-            onPress={() => void setSelectedDevice(device)}
-            variant={selectedDevice?.id === device.id ? 'primary' : 'secondary'}
-          />
-        ))}
-        <StatusMessage tone="success" message={deviceMessage} />
+        <Text style={styles.label}>Printer dropdown</Text>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setIsDeviceDropdownOpen((current) => !current)}
+          style={styles.dropdownButton}
+        >
+          <Text style={selectedDevice ? styles.dropdownText : styles.placeholderText}>
+            {selectedDevice ? getDeviceLabel(selectedDevice) : 'No printer selected'}
+          </Text>
+          <Text style={styles.chevron}>{isDeviceDropdownOpen ? '^' : 'v'}</Text>
+        </Pressable>
+        {isDeviceDropdownOpen ? (
+          <View style={styles.dropdownList}>
+            {devices.length === 0 ? (
+              <Text style={styles.emptyDropdown}>Scan first to load nearby printers.</Text>
+            ) : (
+              devices.map((device) => (
+                <Pressable
+                  accessibilityRole="button"
+                  key={device.id}
+                  onPress={() => void handleSelectDevice(device)}
+                  style={[styles.deviceOption, selectedDevice?.id === device.id && styles.selectedDeviceOption]}
+                >
+                  <View style={styles.deviceOptionHeader}>
+                    <Text style={styles.deviceName}>{device.name}</Text>
+                    <Text style={device.protocol === 'wifi' ? styles.wifiPill : styles.bluetoothPill}>
+                      {device.protocol === 'wifi' ? 'WiFi' : 'Bluetooth'}
+                    </Text>
+                  </View>
+                  <Text style={styles.deviceMeta}>{getDeviceDescription(device)}</Text>
+                </Pressable>
+              ))
+            )}
+          </View>
+        ) : null}
+        {selectedDevice ? (
+          <View style={styles.selectedSummary}>
+            <Text style={styles.selectedSummaryTitle}>Selected printer</Text>
+            <Text style={styles.savedText}>{getDeviceLabel(selectedDevice)}</Text>
+            <Text style={styles.savedText}>{getDeviceDescription(selectedDevice)}</Text>
+          </View>
+        ) : null}
+        <StatusMessage tone={deviceMessage.startsWith('No') ? 'error' : 'success'} message={deviceMessage} />
       </SectionCard>
     </Screen>
   );
@@ -118,6 +163,65 @@ const styles = StyleSheet.create({
   },
   header: {
     gap: spacing.md,
+  },
+  bluetoothPill: {
+    backgroundColor: '#f0eefe',
+    borderRadius: 999,
+    color: '#4d3f91',
+    fontSize: 12,
+    fontWeight: '900',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  chevron: {
+    color: colors.primary,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  deviceMeta: {
+    color: colors.muted,
+    lineHeight: 20,
+  },
+  deviceName: {
+    color: colors.text,
+    flex: 1,
+    fontWeight: '900',
+  },
+  deviceOption: {
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  deviceOptionHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  dropdownButton: {
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: spacing.md,
+    justifyContent: 'space-between',
+    minHeight: 48,
+    paddingHorizontal: 14,
+  },
+  dropdownList: {
+    gap: spacing.sm,
+  },
+  dropdownText: {
+    color: colors.text,
+    flex: 1,
+    fontWeight: '800',
+  },
+  emptyDropdown: {
+    color: colors.muted,
+    fontWeight: '700',
   },
   input: {
     backgroundColor: colors.white,
@@ -139,10 +243,38 @@ const styles = StyleSheet.create({
     color: colors.muted,
     lineHeight: 21,
   },
+  placeholderText: {
+    color: colors.muted,
+    flex: 1,
+    fontWeight: '700',
+  },
+  selectedDeviceOption: {
+    backgroundColor: colors.primarySoft,
+    borderColor: colors.primary,
+  },
+  selectedSummary: {
+    backgroundColor: colors.successBg,
+    borderRadius: 8,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  selectedSummaryTitle: {
+    color: colors.success,
+    fontWeight: '900',
+  },
   title: {
     color: colors.text,
     fontSize: 30,
     fontWeight: '900',
     marginTop: 4,
+  },
+  wifiPill: {
+    backgroundColor: colors.primarySoft,
+    borderRadius: 999,
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '900',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
 });

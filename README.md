@@ -10,15 +10,35 @@ Other branches are still available:
 
 ## What This App Contains
 
-- Login screen.
-- Settings screen.
-- WebView screen.
+- Login screen with Google and Facebook buttons.
+- Settings screen with a website URL input.
+- Settings screen with a WiFi/Bluetooth printer dropdown.
+- WebView screen that opens the saved website URL.
 - Demo/mock social login.
 - Saved website URL.
-- Mock device selection.
+- Mock WiFi and Bluetooth printer discovery.
 - Local persistence with AsyncStorage.
 - React Navigation native stack.
 - WebView rendering with `react-native-webview`.
+
+## How The Task Requirements Are Covered
+
+1. Social media login:
+   - `src/screens/LoginScreen.tsx`
+   - Google and Facebook buttons are available.
+   - Demo mode works immediately.
+
+2. Settings page:
+   - `src/screens/SettingsScreen.tsx`
+   - User can enter and save a website URL.
+   - User can scan for network devices.
+   - WiFi and Bluetooth printers appear in a dropdown list.
+   - Selected printer metadata is saved with AsyncStorage.
+
+3. WebView page:
+   - `src/screens/WebViewScreen.tsx`
+   - The saved URL opens inside `react-native-webview`.
+   - The selected printer is shown as context above the WebView.
 
 ## Why This Branch Starts Simple
 
@@ -30,7 +50,7 @@ This branch starts with simple React Native equivalents first:
 - `iframe` -> `react-native-webview`
 - HTML elements -> `View`, `Text`, `TextInput`, `Pressable`
 - Browser routing -> React Navigation
-- Real Bluetooth -> mock device service first
+- Real WiFi/Bluetooth discovery -> printer-shaped mock device service first
 
 Real Bluetooth and full Firebase auth can be added after the basic app flow is clear.
 
@@ -120,9 +140,41 @@ src/theme.ts            Colors and spacing
 5. Open `src/screens/LoginScreen.tsx`.
 6. See how demo login creates a mock user.
 7. Open `src/screens/SettingsScreen.tsx`.
-8. Save a URL and load mock devices.
+8. Save a URL and scan for WiFi/Bluetooth printers.
 9. Open `src/screens/WebViewScreen.tsx`.
 10. See how the saved URL is rendered with `react-native-webview`.
+
+## Network Devices And Printers
+
+The task asks for:
+
+```text
+Access network devices (wifi - bluetooth) like printer in dropdown list.
+```
+
+In this Expo learning branch, this is implemented as a clean mock discovery service:
+
+```text
+src/services/deviceService.ts
+```
+
+The mock service returns printer-like devices with:
+
+- device name
+- protocol: `wifi` or `bluetooth`
+- address, such as IP address or Bluetooth address
+- signal strength
+- paired/reachable state
+
+This keeps the app runnable in Expo Go while you learn the React Native flow.
+
+For real device discovery later:
+
+- Bluetooth printers usually need `react-native-ble-plx` or another BLE/native Bluetooth package.
+- WiFi printer discovery usually needs mDNS/Bonjour, local network scanning, printer SDKs, or a backend service.
+- These native features normally require an Expo development build, not plain Expo Go.
+- Android needs Bluetooth and sometimes location permissions.
+- iOS needs Bluetooth and local network usage descriptions in native config.
 
 ## Commands
 
@@ -140,7 +192,7 @@ npm start
 
 ## Next Lessons
 
-- Replace mock device service with real BLE.
+- Replace mock device service with real WiFi/Bluetooth discovery.
 - Add Firebase native/social auth.
 - Add form validation polish.
 - Add loading and offline states.

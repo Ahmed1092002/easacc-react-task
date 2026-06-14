@@ -4,6 +4,7 @@ import WebView from 'react-native-webview';
 import AppButton from '../components/AppButton';
 import Screen from '../components/Screen';
 import SectionCard from '../components/SectionCard';
+import { getDeviceDescription, getDeviceLabel } from '../services/deviceService';
 import { colors, spacing } from '../theme';
 import { useApp } from '../state/AppContext';
 import type { RootStackParamList } from '../types';
@@ -29,10 +30,16 @@ export default function WebViewScreen({ navigation }: WebViewScreenProps) {
         <View>
           <Text style={styles.eyebrow}>Web View</Text>
           <Text style={styles.title}>{webUrl}</Text>
-          {selectedDevice ? <Text style={styles.subtitle}>Device: {selectedDevice.name}</Text> : null}
+          {selectedDevice ? <Text style={styles.subtitle}>Printer: {getDeviceLabel(selectedDevice)}</Text> : null}
         </View>
         <AppButton label="Open externally" onPress={() => void Linking.openURL(webUrl)} variant="secondary" />
       </View>
+      {selectedDevice ? (
+        <View style={styles.deviceBar}>
+          <Text style={styles.deviceBarTitle}>Selected network device</Text>
+          <Text style={styles.deviceBarText}>{getDeviceDescription(selectedDevice)}</Text>
+        </View>
+      ) : null}
       <Text style={styles.note}>Some websites block embedded views. Use external open if the page refuses to load.</Text>
       <View style={styles.webviewBox}>
         <WebView source={{ uri: webUrl }} startInLoadingState />
@@ -42,6 +49,20 @@ export default function WebViewScreen({ navigation }: WebViewScreenProps) {
 }
 
 const styles = StyleSheet.create({
+  deviceBar: {
+    backgroundColor: colors.successBg,
+    gap: 4,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  deviceBarText: {
+    color: colors.muted,
+    fontWeight: '700',
+  },
+  deviceBarTitle: {
+    color: colors.success,
+    fontWeight: '900',
+  },
   eyebrow: {
     color: colors.success,
     fontSize: 12,
