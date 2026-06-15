@@ -1,4 +1,5 @@
 import { PermissionsAndroid, Platform } from 'react-native';
+import { BleManager, type BleManager as BleManagerType } from 'react-native-ble-plx';
 import type { DeviceOption } from '../types';
 
 export type DeviceScanResult = {
@@ -40,7 +41,6 @@ async function scanForBluetoothDevices(): Promise<DeviceScanResult> {
       };
     }
 
-    const { BleManager } = await import('react-native-ble-plx');
     const manager = new BleManager();
     const discoveredDevices = new Map<string, DeviceOption>();
 
@@ -114,7 +114,7 @@ async function requestBluetoothPermissions() {
   return permissions.every((permission) => results[permission] === PermissionsAndroid.RESULTS.GRANTED);
 }
 
-async function waitForBluetoothPoweredOn(manager: import('react-native-ble-plx').BleManager) {
+async function waitForBluetoothPoweredOn(manager: BleManagerType) {
   const currentState = await manager.state();
 
   if (currentState === 'PoweredOn') {
@@ -143,3 +143,4 @@ function convertRssiToSignal(rssi: number | null) {
 
   return Math.max(1, Math.min(100, 2 * (rssi + 100)));
 }
+
