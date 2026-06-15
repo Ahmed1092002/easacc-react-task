@@ -38,7 +38,7 @@ Other branches are still available:
 3. WebView page:
    - `src/screens/WebViewScreen.tsx`
    - The saved URL opens inside `react-native-webview`.
-   - The selected printer is shown as context above the WebView.
+   - The selected device is shown as context above the WebView.
    - Refresh and external open fallback are available.
 
 ## Submission Checklist
@@ -63,7 +63,7 @@ This branch starts with simple React Native equivalents first:
 - Browser routing -> React Navigation
 - Real Bluetooth discovery -> `react-native-ble-plx`
 
-Full Firebase auth and WiFi printer discovery can be added after the basic app flow is clear.
+Full Firebase auth and WiFi device discovery can be added after the basic app flow is clear.
 
 ## Install
 
@@ -155,12 +155,12 @@ src/theme.ts            Colors and spacing
 9. Open `src/screens/WebViewScreen.tsx`.
 10. See how the saved URL is rendered with `react-native-webview`.
 
-## Network Devices And Printers
+## Network Devices
 
 The task asks for:
 
 ```text
-Access network devices (wifi - bluetooth) like printer in dropdown list.
+Access network devices (wifi - bluetooth) like a device in dropdown list.
 ```
 
 In this branch, Bluetooth scanning is implemented with `react-native-ble-plx`:
@@ -181,8 +181,8 @@ Real BLE scanning only works in a native development build. Expo Go cannot run t
 
 For real device discovery later:
 
-- Bluetooth printers use `react-native-ble-plx` in this branch.
-- WiFi printer discovery usually needs mDNS/Bonjour, local network scanning, printer SDKs, or a backend service.
+- Bluetooth devices use `react-native-ble-plx` in this branch.
+- WiFi device discovery usually needs mDNS/Bonjour, local network scanning, device SDKs, or a backend service.
 - Native Bluetooth requires an Expo development build, not plain Expo Go.
 - Android needs Bluetooth and sometimes location permissions.
 - iOS needs Bluetooth and local network usage descriptions in native config.
@@ -217,7 +217,7 @@ Current behavior:
 
 - In a development build, the app requests Bluetooth permissions and scans nearby BLE devices.
 - In Expo Go, the app shows no fake devices and explains that native BLE needs a development build.
-- WiFi printer discovery is not mocked. It should be added later as a separate real feature.
+- WiFi device discovery is not mocked. It should be added later as a separate real feature.
 
 ## Commands
 
@@ -235,7 +235,10 @@ npm start
 
 ## Next Lessons
 
-- Add real WiFi printer discovery with mDNS, printer SDK, or backend discovery.
+- Add real WiFi device discovery with mDNS, vendor SDK, or backend discovery.
 - Add Firebase native/social auth.
 - Add form validation polish.
 - Add loading and offline states.
+
+
+

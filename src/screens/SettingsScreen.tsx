@@ -106,14 +106,14 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
           onPress={() => void handleScanDevices()}
           variant="secondary"
         />
-        <Text style={styles.label}>Printer dropdown</Text>
+        <Text style={styles.label}>Device dropdown</Text>
         <Pressable
           accessibilityRole="button"
           onPress={() => setIsDeviceDropdownOpen((current) => !current)}
           style={styles.dropdownButton}
         >
           <Text style={selectedDevice ? styles.dropdownText : styles.placeholderText}>
-            {selectedDevice ? getDeviceLabel(selectedDevice) : 'No printer selected'}
+            {selectedDevice ? getDeviceLabel(selectedDevice) : 'No device selected'}
           </Text>
           <Text style={styles.chevron}>{isDeviceDropdownOpen ? '^' : 'v'}</Text>
         </Pressable>
@@ -143,7 +143,7 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
         ) : null}
         {selectedDevice ? (
           <View style={styles.selectedSummary}>
-            <Text style={styles.selectedSummaryTitle}>Selected printer</Text>
+            <Text style={styles.selectedSummaryTitle}>Selected device</Text>
             <Text style={styles.savedText}>{getDeviceLabel(selectedDevice)}</Text>
             <Text style={styles.savedText}>{getDeviceDescription(selectedDevice)}</Text>
           </View>
@@ -278,3 +278,4 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
 });
+

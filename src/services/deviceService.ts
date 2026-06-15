@@ -20,7 +20,7 @@ export function getDeviceLabel(device: DeviceOption) {
 
 export function getDeviceDescription(device: DeviceOption) {
   const details = [
-    device.protocol === 'wifi' ? 'Network printer' : 'Bluetooth printer',
+    device.protocol === 'wifi' ? 'Network device' : 'Bluetooth device',
     device.address,
     device.signalStrength ? `${device.signalStrength}% signal` : null,
     device.isPaired === true ? 'paired' : null,
@@ -143,4 +143,5 @@ function convertRssiToSignal(rssi: number | null) {
 
   return Math.max(1, Math.min(100, 2 * (rssi + 100)));
 }
+
 

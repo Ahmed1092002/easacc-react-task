@@ -35,7 +35,7 @@ export default function WebViewScreen({ navigation }: WebViewScreenProps) {
         <View>
           <Text style={styles.eyebrow}>Web View</Text>
           <Text style={styles.title}>{webUrl}</Text>
-          {selectedDevice ? <Text style={styles.subtitle}>Printer: {getDeviceLabel(selectedDevice)}</Text> : null}
+          {selectedDevice ? <Text style={styles.subtitle}>Device: {getDeviceLabel(selectedDevice)}</Text> : null}
         </View>
         <View style={styles.headerActions}>
           <AppButton
@@ -149,3 +149,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+

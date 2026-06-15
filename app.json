@@ -13,7 +13,7 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSBluetoothAlwaysUsageDescription": "This app scans nearby Bluetooth printers so the user can select a network device."
+        "NSBluetoothAlwaysUsageDescription": "This app scans nearby Bluetooth devices so the user can select a network device."
       }
     },
     "android": {
@@ -34,3 +34,4 @@
     }
   }
 }
+
